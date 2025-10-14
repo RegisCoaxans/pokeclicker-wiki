@@ -78357,11 +78357,13 @@ $.get('404.html', (data) => {
 // Setup our pages observables
 const pageType = ko.observable();
 const pageName = ko.observable();
+const pageParameters = ko.observable([]);
 const applyBindings = ko.observable(false);
 
 // This is our main function for changing pages
 // Look at onhashchange for what happens after
 const gotoPage = (type, name, other, noHistory) => {
+  console.log(other);
   const hash = `#!${encodeURI(type).replace(/%20/g, '_')}/${encodeURI(name).replace(/%20/g, '_')}${other ? `/${other}`: ''}`;
   if (noHistory) {
     window.history.replaceState(null, null, hash);
@@ -78395,6 +78397,7 @@ scrollToId = (id) => {
 // When the hash changes, we will load the new page
 // This also allows us to go forwards and back in history
 onhashchange = (event) => {
+  console.log('triggered');
   if (!event.oldURL.includes('#!')) {
     return;
   }
@@ -78406,7 +78409,7 @@ onhashchange = (event) => {
     return;
   }
   
-  const [match, path, _scrollElem] = (/.*#!([^#]*)#?(.*)/).exec(event.newURL) ?? [];
+  const [match, path, _scrollElem, query] = (/.*#!([^#?]*)#?([^?]*)\??(.*)/).exec(event.newURL) ?? [];
   const scrollElem = _scrollElem?.endsWith('/') ? _scrollElem.slice(0,-1) : _scrollElem
   let [ type, name, other ] = path.split('/').map(i => decodeURI(i || '').replace(/_/g, ' '));
   if (type == 'loading') {
@@ -78428,6 +78431,9 @@ onhashchange = (event) => {
   }
   pageType(type);
   pageName(name);
+
+  pageParameters(new URLSearchParams(query));
+
   const pageElement = $('#wiki-page-content');
   pageElement.html('');
   // Loading...
@@ -78462,7 +78468,7 @@ onhashchange = (event) => {
       pageElementCustom.html(`<textarea id="custom-edit">${data}</textarea>`);
     } else {
       pageElementCustom.html(md.render(data));
-      scrollToId(scrollElem)
+      scrollToId(scrollElem);
     }
   }).fail(() => {
     if (other == 'edit') {
@@ -78559,6 +78565,7 @@ window.onbeforeunload = () => {
 module.exports = {
     pageType,
     pageName,
+    pageParameters,
     gotoPage,
     gotoPageClick,
 };
@@ -79520,6 +79527,14 @@ const importFromText = () => {
     $('#loadFromTextModal').modal('hide');
 };
 
+const importFromQuery = () => {
+    const setupData = decodeURI(Wiki.pageParameters().get('setup'));
+    if (!setupData) {
+        return;
+    }
+    importFarm(JSON.parse(atob(setupData)));
+}
+
 const importFromFile = (file) => {
     fileReader.readAsText(file);
 };
@@ -79587,6 +79602,7 @@ module.exports = {
     exportFarm,
     importFromText,
     importFromFile,
+    importFromQuery,
     showPlotContextMenu,
 }
 

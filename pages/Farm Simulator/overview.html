@@ -52,7 +52,7 @@
                             optionsValue: 'value',
                             optionsText: (item) => { return item.value == -1 ? 'None' : `#${item.value + 1} - ${item.name}` },
                             value: Wiki.farmSimulator.selectedPlot()?._berry()"
-                            onchange="Wiki.farmSimulator.setPlotBerry(this.value)">
+                            onchange="console.log(`Changing from: ${BerryType[Wiki.farmSimulator.setPlotBerry()]}`); Wiki.farmSimulator.setPlotBerry(this.value)">
                         </select>
                     </div>
                 </div>
@@ -76,7 +76,7 @@
                             optionsValue: 'value',
                             optionsText: (item) => { return item.name.replace('_', ' ') },
                             value: Wiki.farmSimulator.selectedPlot()?._mulch()"
-                            onchange="Wiki.farmSimulator.selectedPlot()?._mulch(this.value)">
+                            onchange="console.log(`Changing from: ${MulchType[Wiki.farmSimulator.selectedPlot()?._mulch()]}`); Wiki.farmSimulator.selectedPlot()?._mulch(this.value);">
                         </select>
                     </div>
                 </div>
@@ -277,3 +277,8 @@
         </div>
     </div>
 </div>
+
+<script>
+    Wiki.farmSimulator.selectedPlotIndex(null);
+    Wiki.farmSimulator.importFromQuery();
+</script>

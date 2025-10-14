@@ -246,6 +246,14 @@ const importFromText = () => {
     $('#loadFromTextModal').modal('hide');
 };
 
+const importFromQuery = () => {
+    const setupData = decodeURI(Wiki.pageParameters().get('setup'));
+    if (!setupData) {
+        return;
+    }
+    importFarm(JSON.parse(atob(setupData)));
+}
+
 const importFromFile = (file) => {
     fileReader.readAsText(file);
 };
@@ -313,5 +321,6 @@ module.exports = {
     exportFarm,
     importFromText,
     importFromFile,
+    importFromQuery,
     showPlotContextMenu,
 }
